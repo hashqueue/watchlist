@@ -2,22 +2,26 @@
 
 {% block content %}
 <p>{{ movies|length }} Titles</p>
-<!--<h3 class="add-movies">添加电影</h3>-->
 <p class="add-movies">添加电影</p>
+<!-- 在模板中可以直接使用 current_user 变量 -->
+{% if current_user.is_authenticated %}
 <form method="post">
     电影名字 <input type="text" name="title" autocomplete="off" required>
     上映年份 <input type="text" name="year" autocomplete="off" required>
     <input class="btn" type="submit" name="submit" value="提交">
 </form>
+{% endif %}
 <ul class="movie-list">
     {% for movie in movies %}
     <li>{{ movie.title }} - {{ movie.year }}
         <span class="float-right">
             <a class="imdb" href="https://movie.douban.com/subject_search?search_text={{ movie.title }}" target="_blank" title="在豆瓣中查找此电影">豆瓣</a>
-            <a class="btn" href="{{ url_for('edit', movie_id=movie.id) }}">编辑</a>
-            <form class="inline-form" method="post" action="{{ url_for('delete', movie_id=movie.id) }}">
-                <input class="btn" type="submit" name="delete" value="删除" onclick="return confirm('确定删除吗?')">
-            </form>
+            {% if current_user.is_authenticated %}
+                <a class="btn" href="{{ url_for('edit', movie_id=movie.id) }}">编辑</a>
+                <form class="inline-form" method="post" action="{{ url_for('delete', movie_id=movie.id) }}">
+                    <input class="btn" type="submit" name="delete" value="删除" onclick="return confirm('确定删除吗?')">
+                </form>
+            {% endif %}
         </span>
     </li>
     {% endfor %}
