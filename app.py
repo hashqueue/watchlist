@@ -6,7 +6,7 @@
 import os
 import click
 
-from flask import Flask
+from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy  # 导入扩展类
 
 app = Flask(__name__)
@@ -33,6 +33,34 @@ class Movie(db.Model):  # 表名将会是 movie
     id = db.Column(db.Integer, primary_key=True)  # id: Integer类型，主键
     title = db.Column(db.String(60))  # 电影标题,Sting类型,长度最长为60
     year = db.Column(db.String(4))  # 电影年份,Sting类型,长度最长为4
+
+
+@app.context_processor
+def inject_user():  # 函数名可以随意修改
+    '''
+    模板上下文处理函数
+    :return: dict: 这个函数返回的变量（以字典键值对的形式）将会统一注入到每一个模板的上下文环境中，因此可以直接在模板中使用。
+    '''
+    user = User.query.first()
+    return dict(user=user)  # 需要返回字典，等同于return {'user': user}
+
+
+# 视图函数
+@app.route('/')
+def index():
+    '''
+    在传入render_template() 函数的关键字参数中，
+    左边的 movies 是模板中使用的变量名称，右边的 movies 则是该变量指向的实际对象。
+    这里传入模板的 name 是字符串，movies 是列表，但能够在模板里使用的不只这两种 Python 数据结构，你也可以传入元组、字典、函数等。
+    :return: index.html文件
+    '''
+    movies = Movie.query.all()  # 读取所有电影记录
+    return render_template('index.html', movies=movies)
+
+
+@app.errorhandler(404)  # 传入要处理的错误代码
+def page_not_found(e):  # 接受异常对象作为参数
+    return render_template('404.html'), 404  # 返回模板和状态码
 
 
 @app.cli.command()

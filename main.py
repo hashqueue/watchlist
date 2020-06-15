@@ -4,7 +4,6 @@
 # @Author    : ABC
 # @FileName  : main.py
 from flask import Flask, render_template
-from app import User, Movie
 
 app = Flask(__name__)
 
@@ -33,9 +32,9 @@ def index():
     这里传入模板的 name 是字符串，movies 是列表，但能够在模板里使用的不只这两种 Python 数据结构，你也可以传入元组、字典、函数等。
     :return: index.html文件
     '''
-    user = User.query.first()  # 读取用户记录
-    movies = Movie.query.all()  # 读取所有电影记录
-    return render_template('index.html', user=user, movies=movies)
+    # user = User.query.first()  # 读取用户记录
+    # movies = Movie.query.all()  # 读取所有电影记录
+    return render_template('index.html', user=name, movies=movies)
 
 
 if __name__ == '__main__':
