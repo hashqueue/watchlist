@@ -3,6 +3,7 @@
 # @Time      : 2020/6/15 下午3:11
 # @Author    : ABC
 # @FileName  : app.py
+# @Description : 示例代码，只做参考，程序代码均在watchlist子目录里
 import os
 import click
 
@@ -21,7 +22,8 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////' + os.path.join(app.root_path, 'data.db')
 # print(app.config.get('SQLALCHEMY_DATABASE_URI'))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # 关闭对模型修改的监控
-app.config['SECRET_KEY'] = 'pbkdf2:sha256:50000$mm9UPTRI$ee68ebc71434a4405a28d34ae3f170757fb424663dc0ca15198cb881edc0978f'
+app.config[
+    'SECRET_KEY'] = 'pbkdf2:sha256:50000$mm9UPTRI$ee68ebc71434a4405a28d34ae3f170757fb424663dc0ca15198cb881edc0978f'
 
 # 初始化扩展，传入程序实例 app,在扩展类实例化前加载配置
 db = SQLAlchemy(app)
@@ -174,7 +176,7 @@ def delete(movie_id):
 
 @app.errorhandler(404)  # 传入要处理的错误代码
 def page_not_found(e):  # 接受异常对象作为参数
-    return render_template('404.html'), 404  # 返回模板和状态码
+    return render_template('errors/404.html'), 404  # 返回模板和状态码
 
 
 @app.cli.command()
@@ -207,6 +209,7 @@ def forge():
     click.echo('Done.')
 
 
+# 设置管理员账户名密码
 @app.cli.command()
 @click.option('--username', prompt=True, help='The username used to login.')
 @click.option('--password', prompt=True, hide_input=True, confirmation_prompt=True, help='The password used to login.')
@@ -227,6 +230,22 @@ def admin(username, password):
 
     db.session.commit()  # 提交数据库会话
     click.echo('Done.')
+
+
+# 初始化db
+'''
+默认情况下，函数名称就是命令的名字，在flask shell中执行`flask initdb`命令就可以创建数据库表
+'''
+
+
+@app.cli.command()  # 注册为命令
+@click.option('--drop', is_flag=True, help='Create after drop.')  # 设置选项
+def initdb(drop):
+    """Initialize the database."""
+    if drop:  # 判断是否输入了选项
+        db.drop_all()
+    db.create_all()
+    click.echo('Initialized database.')  # 输出提示信息
 
 
 @login_manager.user_loader
