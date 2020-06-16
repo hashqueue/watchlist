@@ -10,12 +10,19 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 
+# SQLite URI compatible
+WIN = sys.platform.startswith('win')
+if WIN:
+    prefix = 'sqlite:///'
+else:
+    prefix = 'sqlite:////'
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev')
 # 注意更新这里的路径，把 app.root_path 添加到 os.path.dirname() 中
 # 以便把文件定位到项目根目录
-app.config['SQLALCHEMY_DATABASE_URI'] = sys.prefix + os.path.join(os.path.dirname(app.root_path), os.getenv('DATABASE_FILE', 'data.db'))
+app.config['SQLALCHEMY_DATABASE_URI'] = prefix + os.path.join(os.path.dirname(app.root_path),
+                                                              os.getenv('DATABASE_FILE', 'data.db'))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # 关闭对模型修改的监控
 
 # 初始化扩展，传入程序实例 app,在扩展类实例化前加载配置
@@ -40,6 +47,7 @@ def inject_user():
     from watchlist.models import User
     user = User.query.first()
     return dict(user=user)
+
 
 '''
 在构造文件中，为了让视图函数、错误处理函数和命令函数注册到程序实例上，我们需要在这里导入这几个模块。
