@@ -1,8 +1,6 @@
 ## flask学习demo
 ### 一个观影清单小程序
-[在线体验地址](http://wenbin.org.cn:5000/)
-
-体验账号:admin,密码:123456
+[点我查看本项目demo对应的教程](https://read.helloflask.com/)
 ### 部署相关
 
 采用flask+uwsgi部署的项目
